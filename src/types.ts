@@ -1,6 +1,6 @@
 export type Todo = {
     description: string;
-    date: Date;
+    date: string;
 }
 
 export type TodoTableProps = {

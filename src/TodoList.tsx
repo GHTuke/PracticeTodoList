@@ -3,16 +3,15 @@ import { Todo } from "./types";
 import TodoTable from "./TodoTable";
 
 function TodoList() {
-    const [todo, setTodo] = useState<Todo>({ description: '', date: new Date() });
+    const [todo, setTodo] = useState<Todo>({ description: '', date: '' });
     const [todos, setTodos] = useState<Todo[]>([]);
 
     const addTodo = () => {
         // Estää tyhjän kentän lisäämisen
-        if (!todo.description) return;
+        if (!todo.description || !todo.date) return;
         setTodos([...todos, todo]);
-        // Tyhjentää kentän kun syöte annettu
-        // ei toimi daten kanssa, pitäisi muokata date muotoon string jne. Liikaa koodimuokkauksia for value
-        setTodo({ description: '', date: new Date() });
+        // Tyhjentää syöttökentän kun syöte annettu
+        setTodo({ description: '', date: '' });
     };
 
     // poistaa indeksin mukaisen todon
@@ -25,7 +24,8 @@ function TodoList() {
             <h1>Todo List</h1>
             <input
                 type="date"
-                onChange={(event) => setTodo({ ...todo, date: new Date(event.target.value) })}
+                onChange={(event) => setTodo({ ...todo, date: event.target.value })}
+                value={todo.date}
             />
             <input
                 placeholder="Description"

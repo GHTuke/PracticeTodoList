@@ -1,5 +1,5 @@
 import './App.css'
-import TodoList from "./todolist";
+import TodoList from './TodoList'
 
 function App() {
 

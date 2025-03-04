@@ -13,7 +13,7 @@ function TodoTable(props: TodoTableProps) {
                 <tbody>
                     {props.todos.map((todo, index) => (
                         <tr key={index}>
-                            <td>{todo.date.toDateString()}</td>
+                            <td>{new Date(todo.date).toLocaleDateString("fi-FI")}</td>
                             <td>{todo.description}</td>
                             <td>
                                 <button onClick={() => props.handleDelete(index)}>Delete</button>
