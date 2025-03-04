@@ -1,40 +1,102 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Todo } from "./types";
-import TodoTable from "./TodoTable";
+import { AgGridReact } from "ag-grid-react";
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { ColDef } from "ag-grid-community";
+
+
+// kaikkien moduulien rekisteröinti (voisi myös ottaa yksitellen)
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 function TodoList() {
-    const [todo, setTodo] = useState<Todo>({ description: '', date: '' });
+    const [todo, setTodo] = useState<Todo>({ description: '', priority: '', date: '' });
     const [todos, setTodos] = useState<Todo[]>([]);
+    const gridRef = useRef<AgGridReact<Todo>>(null);
 
     const addTodo = () => {
         // Estää tyhjän kentän lisäämisen
         if (!todo.description || !todo.date) return;
         setTodos([...todos, todo]);
         // Tyhjentää syöttökentän kun syöte annettu
-        setTodo({ description: '', date: '' });
+        setTodo({ description: '', priority: '', date: '' });
     };
 
     // poistaa indeksin mukaisen todon
-    const deleteTodo = (index: number) => {
-        setTodos(todos.filter((_, i) => i !== index));
+    const deleteTodo = () => {
+        if (gridRef.current?.api.getSelectedNodes().length) {
+            setTodos(todos.filter((_todo, i) => i !== Number(gridRef.current?.api.getSelectedNodes()[0].id)));
+        } else {
+            alert('Select a row first')
+        }
     }
+
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString("fi-FI")
+    }
+
+    // Aika paljon kateltu ylimääräsiä määrityksiä https://www.ag-grid.com/react-data-grid/column-properties/
+    const [columnDefs] = useState<ColDef<Todo>[]>([
+        {
+            field: "priority",
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            // poistaa ylimääräisen filterinapin floatin filteristä, jättää sen vielä itse rivivalintaan
+            suppressFloatingFilterButton: true,
+            // initialFlex:in avulla täyttyy alkuun koko grid, mutta pysyy itse säädettävänä
+            initialFlex: 1
+        },
+        {
+            field: "description",
+            filter: true,
+            sortable: true,
+            floatingFilter: true,
+            suppressFloatingFilterButton: true,
+            initialFlex: 2
+        },
+        {
+            field: "date",
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            suppressFloatingFilterButton: true,
+            initialFlex: 1,
+            valueFormatter: (params) => formatDate(params.value)
+        },
+    ])
 
     return (
         <>
             <h1>Todo List</h1>
-            <input
-                type="date"
-                onChange={(event) => setTodo({ ...todo, date: event.target.value })}
-                value={todo.date}
-            />
+            <select
+                onChange={event => setTodo({ ...todo, priority: event.target.value })}
+                value={todo.priority}
+            >
+                <option value=''>Select Priority</option>
+                <option value='Low'>Low</option>
+                <option value='Medium'>Medium</option>
+                <option value='High'>High</option>
+            </select>
             <input
                 placeholder="Description"
                 onChange={event => setTodo({ ...todo, description: event.target.value })}
                 value={todo.description}
             />
+            <input
+                type="date"
+                onChange={(event) => setTodo({ ...todo, date: event.target.value })}
+                value={todo.date}
+            />
             <button onClick={addTodo}>Add</button>
-
-            <TodoTable todos={todos} handleDelete={deleteTodo} />
+            <button onClick={deleteTodo}>Delete</button>
+            <div style={{ width: 700, height: 500 }}>
+                <AgGridReact
+                    ref={gridRef}
+                    rowData={todos}
+                    columnDefs={columnDefs}
+                    rowSelection="single"
+                />
+            </div>
         </>
     );
 }

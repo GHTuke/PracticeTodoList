@@ -1,4 +1,5 @@
 export type Todo = {
+    priority: string;
     description: string;
     date: string;
 }

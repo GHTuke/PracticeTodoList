@@ -1,3 +1,8 @@
+/* 
+HOX
+Vielä löytyy tarvittaessa, mutta ei ole käytössä missään
+HOX
+
 import { TodoTableProps } from "./types";
 
 function TodoTable(props: TodoTableProps) {
@@ -6,6 +11,7 @@ function TodoTable(props: TodoTableProps) {
             <table>
                 <thead>
                     <tr>
+                        <td>Priority</td>
                         <td>Date</td>
                         <td>Description</td>
                     </tr>
@@ -13,6 +19,7 @@ function TodoTable(props: TodoTableProps) {
                 <tbody>
                     {props.todos.map((todo, index) => (
                         <tr key={index}>
+                            <td>{todo.priority}</td>
                             <td>{new Date(todo.date).toLocaleDateString("fi-FI")}</td>
                             <td>{todo.description}</td>
                             <td>
@@ -28,3 +35,4 @@ function TodoTable(props: TodoTableProps) {
 }
 
 export default TodoTable;
+*/
