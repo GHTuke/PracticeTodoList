@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
 import { Todo } from "./types";
 import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry, themeBalham } from 'ag-grid-community';
 import { ColDef } from "ag-grid-community";
+import "./App.css";
 
 
 // kaikkien moduulien rekisteröinti (voisi myös ottaa yksitellen)
@@ -67,35 +68,40 @@ function TodoList() {
 
     return (
         <>
-            <h1>Todo List</h1>
-            <select
-                onChange={event => setTodo({ ...todo, priority: event.target.value })}
-                value={todo.priority}
-            >
-                <option value=''>Select Priority</option>
-                <option value='Low'>Low</option>
-                <option value='Medium'>Medium</option>
-                <option value='High'>High</option>
-            </select>
-            <input
-                placeholder="Description"
-                onChange={event => setTodo({ ...todo, description: event.target.value })}
-                value={todo.description}
-            />
-            <input
-                type="date"
-                onChange={(event) => setTodo({ ...todo, date: event.target.value })}
-                value={todo.date}
-            />
-            <button onClick={addTodo}>Add</button>
-            <button onClick={deleteTodo}>Delete</button>
-            <div style={{ width: 700, height: 500 }}>
-                <AgGridReact
-                    ref={gridRef}
-                    rowData={todos}
-                    columnDefs={columnDefs}
-                    rowSelection="single"
-                />
+            <div className="App">
+                <h1>Todo List</h1>
+                <fieldset>
+                    <legend>Add todo:</legend>
+                    <select
+                        onChange={event => setTodo({ ...todo, priority: event.target.value })}
+                        value={todo.priority}
+                    >
+                        <option value=''>Select Priority</option>
+                        <option value='Low'>Low</option>
+                        <option value='Medium'>Medium</option>
+                        <option value='High'>High</option>
+                    </select>
+                    <input
+                        placeholder="Description"
+                        onChange={event => setTodo({ ...todo, description: event.target.value })}
+                        value={todo.description}
+                    />
+                    <input
+                        type="date"
+                        onChange={(event) => setTodo({ ...todo, date: event.target.value })}
+                        value={todo.date}
+                    />
+                    <button onClick={addTodo}>Add</button>
+                    <button onClick={deleteTodo}>Delete</button>
+                </fieldset>
+                <div style={{ width: 700, height: 500 }}>
+                    <AgGridReact
+                        ref={gridRef}
+                        rowData={todos}
+                        columnDefs={columnDefs}
+                        rowSelection="single"
+                    />
+                </div>
             </div>
         </>
     );
