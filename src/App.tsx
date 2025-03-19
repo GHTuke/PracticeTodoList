@@ -1,11 +1,16 @@
 import './App.css'
 import TodoList from './TodoList'
 
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
 function App() {
 
   return (
     <>
-      <TodoList />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <TodoList />
+      </LocalizationProvider>
     </>
   )
 }

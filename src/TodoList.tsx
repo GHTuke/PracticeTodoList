@@ -4,6 +4,9 @@ import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ModuleRegistry, themeBalham } from 'ag-grid-community';
 import { ColDef } from "ag-grid-community";
 import "./App.css";
+import { DatePicker } from "@mui/x-date-pickers";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import dayjs from "dayjs";
 
 
 // kaikkien moduulien rekisteröinti (voisi myös ottaa yksitellen)
@@ -31,9 +34,18 @@ function TodoList() {
         }
     }
 
+    /*
+    Vanhaan päivämäärä formatointiin ennen MUI datepickeriä
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("fi-FI")
     }
+    */
+
+    const handleDateChange = (date: dayjs.Dayjs | null) => {
+        if (date) {
+            setTodo({ ...todo, date: date.format("DD.MM.YYYY") });
+        }
+    };
 
     // Aika paljon kateltu ylimääräsiä määrityksiä https://www.ag-grid.com/react-data-grid/column-properties/
     const [columnDefs] = useState<ColDef<Todo>[]>([
@@ -62,7 +74,10 @@ function TodoList() {
             floatingFilter: true,
             suppressFloatingFilterButton: true,
             initialFlex: 1,
+            /*
+            Jos ottaa MUI datepickerin pois voi stringin formatoida tätä kautta
             valueFormatter: (params) => formatDate(params.value)
+            */
         },
     ])
 
@@ -72,27 +87,48 @@ function TodoList() {
                 <h1>Todo List</h1>
                 <fieldset>
                     <legend>Add todo:</legend>
-                    <select
-                        onChange={event => setTodo({ ...todo, priority: event.target.value })}
-                        value={todo.priority}
-                    >
-                        <option value=''>Select Priority</option>
-                        <option value='Low'>Low</option>
-                        <option value='Medium'>Medium</option>
-                        <option value='High'>High</option>
-                    </select>
-                    <input
+
+                    {/*https://mui.com/material-ui/react-select/*/}
+                    <FormControl sx={{ minWidth: 120 }} size="medium">
+                        <InputLabel>Priority</InputLabel>
+                        <Select
+                            onChange={event => setTodo({ ...todo, priority: event.target.value })}
+                            value={todo.priority}
+                            label="Priority"
+                        >
+                            <MenuItem value='Low'>Low</MenuItem>
+                            <MenuItem value='Medium'>Medium</MenuItem>
+                            <MenuItem value='High'>High</MenuItem>
+                        </Select>
+                    </FormControl>
+
+
+                    <TextField
                         placeholder="Description"
                         onChange={event => setTodo({ ...todo, description: event.target.value })}
                         value={todo.description}
                     />
+
+
+                    {/*
                     <input
                         type="date"
                         onChange={(event) => setTodo({ ...todo, date: event.target.value })}
                         value={todo.date}
                     />
-                    <button onClick={addTodo}>Add</button>
-                    <button onClick={deleteTodo}>Delete</button>
+                    */}
+
+                    {/*https://mui.com/x/react-date-pickers/getting-started/*/}
+                    <DatePicker
+                        label="Select Date"
+                        value={todo.date ? dayjs(todo.date, "DD.MM.YYYY") : null}
+                        onChange={handleDateChange}
+                        format="DD.MM.YYYY"
+                    />
+
+                    {/*https://mui.com/material-ui/react-button/#color*/}
+                    <Button variant="outlined" size="large" color="inherit" onClick={addTodo}>Add</Button>
+                    <Button variant="outlined" size="large" color="inherit" onClick={deleteTodo}>Delete</Button>
                 </fieldset>
                 <div style={{ width: 700, height: 500 }}>
                     <AgGridReact
