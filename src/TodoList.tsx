@@ -5,7 +5,7 @@ import { AllCommunityModule, ModuleRegistry, themeBalham } from 'ag-grid-communi
 import { ColDef } from "ag-grid-community";
 import "./App.css";
 import { DatePicker } from "@mui/x-date-pickers";
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, Tab, Tabs, TextField } from "@mui/material";
 import dayjs from "dayjs";
 
 
@@ -16,6 +16,12 @@ function TodoList() {
     const [todo, setTodo] = useState<Todo>({ description: '', priority: '', date: '' });
     const [todos, setTodos] = useState<Todo[]>([]);
     const gridRef = useRef<AgGridReact<Todo>>(null);
+    const [tabNumber, setTabNumber] = useState(0);
+
+
+    const handleTabChange = (_event: React.SyntheticEvent, value: number) => {
+        setTabNumber(value);
+    };
 
     const addTodo = () => {
         // Estää tyhjän kentän lisäämisen
@@ -41,6 +47,7 @@ function TodoList() {
     }
     */
 
+    // Olisi ehkä ollut fiksumpaa siirtyä kokonaan dayjs muotoon myös tyyppimäärittelyssä, mutta mennään tällä
     const handleDateChange = (date: dayjs.Dayjs | null) => {
         if (date) {
             setTodo({ ...todo, date: date.format("DD.MM.YYYY") });
@@ -75,7 +82,7 @@ function TodoList() {
             suppressFloatingFilterButton: true,
             initialFlex: 1,
             /*
-            Jos ottaa MUI datepickerin pois voi stringin formatoida tätä kautta
+            Jos ottaa MUI datepickerin pois voi päivämäärä stringin formatoida tätä kautta
             valueFormatter: (params) => formatDate(params.value)
             */
         },
@@ -84,33 +91,52 @@ function TodoList() {
     return (
         <>
             <div className="App">
-                <h1>Todo List</h1>
-                <fieldset>
-                    <legend>Add todo:</legend>
+                {/* 
+                centered pitää valikon aina samassa kohdassa keskellä 
+                textColor inherit vaihtaa tabivalikon tekstivärin perimällä sen tyylimäärittelystä, eikä automaattisella sinisellä
+                */}
+                <Tabs value={tabNumber} onChange={handleTabChange} textColor="inherit" centered>
+                    <Tab label="Home" />
+                    <Tab label="Todo" />
+                </Tabs>
 
-                    {/*https://mui.com/material-ui/react-select/*/}
-                    <FormControl sx={{ minWidth: 120 }} size="medium">
-                        <InputLabel>Priority</InputLabel>
-                        <Select
-                            onChange={event => setTodo({ ...todo, priority: event.target.value })}
-                            value={todo.priority}
-                            label="Priority"
-                        >
-                            <MenuItem value='Low'>Low</MenuItem>
-                            <MenuItem value='Medium'>Medium</MenuItem>
-                            <MenuItem value='High'>High</MenuItem>
-                        </Select>
-                    </FormControl>
+                {/* Valitsee tabNumberin mukaan kumman tabin näyttää */}
+                {tabNumber === 0 && (
+                    <div>
+                        <h1>Homepage</h1>
+                        <p>This is the homepage</p>
+                    </div>
+                )}
+
+                {tabNumber === 1 && (
+                    <>
+                        <h1>Todo List</h1>
+                        <fieldset>
+                            <legend>Add todo:</legend>
+
+                            {/*https://mui.com/material-ui/react-select/*/}
+                            <FormControl sx={{ minWidth: 120 }} size="medium">
+                                <InputLabel>Priority</InputLabel>
+                                <Select
+                                    onChange={event => setTodo({ ...todo, priority: event.target.value })}
+                                    value={todo.priority}
+                                    label="Priority"
+                                >
+                                    <MenuItem value='Low'>Low</MenuItem>
+                                    <MenuItem value='Medium'>Medium</MenuItem>
+                                    <MenuItem value='High'>High</MenuItem>
+                                </Select>
+                            </FormControl>
 
 
-                    <TextField
-                        placeholder="Description"
-                        onChange={event => setTodo({ ...todo, description: event.target.value })}
-                        value={todo.description}
-                    />
+                            <TextField
+                                placeholder="Description"
+                                onChange={event => setTodo({ ...todo, description: event.target.value })}
+                                value={todo.description}
+                            />
 
 
-                    {/*
+                            {/* vanha päivämäärä input ennen MUI datepickeriä
                     <input
                         type="date"
                         onChange={(event) => setTodo({ ...todo, date: event.target.value })}
@@ -118,26 +144,31 @@ function TodoList() {
                     />
                     */}
 
-                    {/*https://mui.com/x/react-date-pickers/getting-started/*/}
-                    <DatePicker
-                        label="Select Date"
-                        value={todo.date ? dayjs(todo.date, "DD.MM.YYYY") : null}
-                        onChange={handleDateChange}
-                        format="DD.MM.YYYY"
-                    />
+                            {/*
+                            https://mui.com/x/react-date-pickers/getting-started/
+                            asetin lokalisaattorin koko appin ympärille App.tsx tiedostossa niin ei tarvitse erikseen asettaa täältä
+                            */}
+                            <DatePicker
+                                label="Select Date"
+                                value={todo.date ? dayjs(todo.date, "DD.MM.YYYY") : null}
+                                onChange={handleDateChange}
+                                format="DD.MM.YYYY"
+                            />
 
-                    {/*https://mui.com/material-ui/react-button/#color*/}
-                    <Button variant="outlined" size="large" color="inherit" onClick={addTodo}>Add</Button>
-                    <Button variant="outlined" size="large" color="inherit" onClick={deleteTodo}>Delete</Button>
-                </fieldset>
-                <div style={{ width: 700, height: 500 }}>
-                    <AgGridReact
-                        ref={gridRef}
-                        rowData={todos}
-                        columnDefs={columnDefs}
-                        rowSelection="single"
-                    />
-                </div>
+                            {/*https://mui.com/material-ui/react-button/#color*/}
+                            <Button variant="outlined" size="large" color="inherit" onClick={addTodo}>Add</Button>
+                            <Button variant="outlined" size="large" color="inherit" onClick={deleteTodo}>Delete</Button>
+                        </fieldset>
+                        {/* width: 100% skaalaa taulukon muun sivuston määritysten mukaan */}
+                        <div style={{ width: "100%", height: 500 }}>
+                            <AgGridReact
+                                ref={gridRef}
+                                rowData={todos}
+                                columnDefs={columnDefs}
+                                rowSelection="single"
+                            />
+                        </div>
+                    </>)}
             </div>
         </>
     );
